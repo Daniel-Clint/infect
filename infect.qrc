@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/infect"/>
+    <qresource prefix="/image">
+        <file>R_8X.jpg</file>
+        <file>OIP-C_8X-1.jpg</file>
+    </qresource>
+    <qresource prefix="/icon">
+        <file>OIP-C_8X-1.ico</file>
+    </qresource>
+    <qresource prefix="/sound"/>
+</RCC>
