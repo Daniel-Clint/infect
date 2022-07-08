@@ -1,6 +1,7 @@
 #include "CentralWidget.h"
 #include "rocks.h"
 #include <QMessageBox>
+#include<time.h>
 
 CentralWidget::CentralWidget(QWidget *parent)
 	: QWidget(parent)
@@ -23,12 +24,21 @@ void CentralWidget::on_pushButton_toggled(bool checked)
     ui.clearButton->setEnabled(!checked);
     ui.spinBox->setEnabled(!checked);
     ui.spinBox_2->setEnabled(!checked);
-    if (checked) {
-        ///
+    if (checked) 
+    {
+        //运行状态
+        ((rocks*)(ui.widget))->start_infecting();
     }
-    else {
-        ///
+    else 
+    {
+        //暂停状态
+        ((rocks*)(ui.widget))->pause_infecting();
     }
+}
+
+void CentralWidget::on_clearButton_clicked()
+{
+    ((rocks*)(ui.widget))->rocks_clear();
 }
 
 void CentralWidget::on_spinBox_valueChanged(int value)

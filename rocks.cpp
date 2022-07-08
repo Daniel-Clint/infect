@@ -3,15 +3,21 @@
 #include <QPainter>
 #include <QtMath>
 #include<QMouseEvent>
+#include<time.h>
+
+
 rocks::rocks(QWidget *parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
     states.insert(0, X * Y, false);
+    connect(timer, &QTimer::timeout, this, &rocks::on_clock);
+    srand(time(NULL));
 }
 
 rocks::~rocks()
 {
+    delete timer;
 }
 
 void rocks::paintEvent(QPaintEvent* event)
@@ -68,6 +74,9 @@ void rocks::setX(int x)
     X = x;
     states.clear();
     states.insert(0, X * Y, false);
+    next.clear();
+    next.insert(0, X * Y, false);
+
     update();
 }
 
@@ -76,11 +85,24 @@ void rocks::setY(int y)
     Y = y;
     states.clear();
     states.insert(0, X * Y, false);
+    next.clear();
+    next.insert(0, X * Y, false);
+
+    update();
+}
+
+void rocks::rocks_clear()
+{
+    states.clear();
+    states.insert(0, X * Y, false);
+    next.clear();
+    next.insert(0, X * Y, false);
     update();
 }
 
 void rocks::mousePressEvent(QMouseEvent* event)
 {
+    if (timer->isActive())return;
     int W = this->width();
     int H = this->height();
     int PE = 0.9 * qMin(W / X, H / Y);
@@ -106,5 +128,69 @@ void rocks::mousePressEvent(QMouseEvent* event)
         }
         update();
     }
+}
+
+void rocks::start_infecting()
+{
+    timer->start(50);
+}
+
+void rocks::pause_infecting()
+{
+    timer->stop();
+}
+
+void rocks::on_clock()
+{
+    int carrier=0;
+    int up, down, left, right;
     
+    for (int i = 0; i < X * Y; i++)
+    {
+        next[i] = false;
+    }
+
+    for (int i = 0; i < X * Y; i++)//获取下一次变化
+    {
+        carrier = 0;
+        if (i % X == i)//最上面一排
+            up = X * (Y - 1) + i;
+        else
+            up = i - X;
+        if (i % X == 0)//最左边一列
+            left = i + X - 1;
+        else
+            left = i - 1;
+        if (i % X == (X - 1))//最右边一列
+            right = i - X + 1;
+        else
+            right = i + 1;
+        if (i / X == (Y - 1))//最下面一排
+            down = i - X * (Y - 1);
+        else
+            down = i + X;
+
+        if (states[up])
+            carrier++;
+        if (states[left])
+            carrier++;
+        if (states[right])
+            carrier++;
+        if (states[down])
+            carrier++;
+
+        for (int j = 0; j < carrier; j++)
+        {
+            if (rand() % 20==1)
+            {
+                next[i] = true;
+                break;
+            }
+        }
+
+        if (states[i])next[i] = true;
+    }
+
+    states = next;
+    update();
 }
